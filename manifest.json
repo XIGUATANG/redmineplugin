@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "西瓜呀",
+  "description": "考勤统计",
+  "version": "1.0",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png"
+  },
+  "permissions": ["tabs", "http://*/*", "https://*/*"],
+  "content_scripts": [
+    {
+      "js": ["index.js"],
+      "matches": ["http://tcoa.17usoft.com/platform/EmployeeBase/Attendance*"],
+      "run_at": "document_end"
+    }
+  ]
+}
