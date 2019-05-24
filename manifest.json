@@ -1,19 +1,20 @@
 {
   "manifest_version": 2,
   "name": "西瓜呀",
-  "description": "考勤统计",
+  "description": "redmine辅助工具",
   "version": "1.0",
   "browser_action": {
-    "default_icon": "icon.png"
+    "default_icon": "images/icon.png",
+    "default_title": "西瓜呀"
   },
   "icons": {
-    "16": "icon.png"
+    "16": "images/icon.png"
   },
-  "permissions": ["tabs", "http://*/*", "https://*/*"],
+  "permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
   "content_scripts": [
     {
       "js": ["index.js"],
-      "matches": ["http://tcoa.17usoft.com/platform/EmployeeBase/Attendance*"],
+      "matches": ["http://10.119.169.5/redmine/*"],
       "run_at": "document_end"
     }
   ]
