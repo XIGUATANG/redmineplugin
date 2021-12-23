@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "西瓜呀",
-  "description": "redmine辅助工具",
+  "description": "mapi json 转换成ts类型",
   "version": "1.0",
   "browser_action": {
     "default_icon": "images/icon.png",
@@ -10,11 +10,19 @@
   "icons": {
     "16": "images/icon.png"
   },
-  "permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
+  "web_accessible_resources": [
+    "src/*"
+  ],
   "content_scripts": [
     {
-      "js": ["index.js"],
-      "matches": ["http://10.119.169.5/redmine/*"],
+      "css":["./highlight.css"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_start"
+    },
+    {
+      "css":["./highlight.css"],
+      "js": ["index.js","src/lib/index.js","src/lib/highlight.js"],
+      "matches": ["https://mapi.be.youpin.cn/*"],
       "run_at": "document_end"
     }
   ]

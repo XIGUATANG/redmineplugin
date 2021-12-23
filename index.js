@@ -1,81 +1,73 @@
-async function autoLogin() {
-  const username = localStorage.getItem('username'),
-    pwd = localStorage.getItem('pwd')
-  let inputUserName = document.querySelector('#username'),
-    inputPwd = document.querySelector('#password')
-  inputUserName && username && (inputUserName.value = username)
-  inputPwd && pwd && (inputPwd.value = pwd)
-}
+(async () => {
+  const src = chrome.extension.getURL("src/main.js");
+  const contentScript = await import(src);
+  contentScript.main(/* chrome: no need to pass it */);
 
-function saveLogin() {
-  let submitBtn = document.getElementById('login-submit')
-  submitBtn &&
-    submitBtn.addEventListener('click', () => {
-      let username = document.getElementById('username').value,
-        pwd = document.getElementById('password').value
-      localStorage.setItem('username', username)
-      localStorage.setItem('pwd', pwd)
+  console.log("111", typeofJsonc);
+
+  window.typeofJsonc = typeofJsonc;
+
+  setTimeout(start, 2000);
+})();
+
+// var a = chrome.extension.getURL("src/highlight.css");
+// $('<link rel="stylesheet" type="text/css" href="' + a + '" >').appendTo("head");
+
+
+let link = document.createElement("link");
+link.href = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css'
+link.rel = 'stylesheet'
+// link.setAttribute("rel", "stylesheet");
+// link.setAttribute("type", "text/css");
+// link.setAttribute("href", '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css');
+document.querySelector('head').appendChild(link);
+
+function start() {
+  let str = [...document.querySelectorAll(".ace_content")].map(
+    (item) => item.innerText
+  );
+
+  const toTS = (str, name) =>
+    typeofJsonc.default(str, name, {
+      prefix: "",
+      rootFlags: 1,
+      disallowComments: false,
+      addExport: false,
+      singleLineJsDocComments: true,
+    });
+
+  console.log(
+    typeofJsonc.default(str[1], "request", {
+      prefix: "",
+      rootFlags: 1,
+      disallowComments: false,
+      addExport: true,
+      singleLineJsDocComments: true,
     })
-}
-if (location.pathname === '/redmine/login') {
-  autoLogin()
-  saveLogin()
-}
-if (/\/redmine\/issues\/\d+/.test(location.pathname)) {
-  document.querySelector('#content .icon-edit').addEventListener('click', () => {
-    setTimeout(() => editIssue(), 200)
-  })
-}
+  );
 
-Date.prototype.format = dateFormat
-
-function editIssue() {
-  let status,
-    assigner,
-    reporter,
-    statusSelect = document.getElementById('issue_status_id'),
-    assignerSelect = document.getElementById('issue_assigned_to_id'),
-    reporterSelect = document.getElementById('issue_custom_field_values_21')
-  if (statusSelect) status = statusSelect.value
-  if (assignerSelect) assigner = assignerSelect.value
-  if (reporterSelect) reporter = reporterSelect.value
-  if (!['1', '10'].includes(status)) return ''
-  statusSelect.value = '3'
-  statusSelect.dispatchEvent(new Event('change'))
-  setTimeout(() => {
-    let resolverSlect = document.getElementById('issue_custom_field_values_18')
-    statusSelect = document.getElementById('issue_status_id')
-    assignerSelect = document.getElementById('issue_assigned_to_id')
-    reporterSelect = document.getElementById('issue_custom_field_values_21')
-    dateInput = document.getElementById('issue_custom_field_values_19')
-    if (resolverSlect) resolverSlect.value = assigner || ''
-    if (assignerSelect) assignerSelect.value = reporter || ''
-    console.log(assignerSelect, reporter)
-    let doneSelect = document.getElementById('issue_done_ratio')
-    if (doneSelect) doneSelect.value = '100'
-    if (dateInput) dateInput.value = new Date().format()
-  }, 500)
-}
-
-function dateFormat(fmt = 'yyyy-MM-dd') {
-  var o = {
-    'M+': this.getMonth() + 1, //月份
-    'd+': this.getDate(), //日
-    'h+': this.getHours(), //小时
-    'm+': this.getMinutes(), //分
-    's+': this.getSeconds(), //秒
-    'q+': Math.floor((this.getMonth() + 3) / 3), //季度
-    S: this.getMilliseconds() //毫秒
+  function insertAfter(referenceNode, newNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
   }
-  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
-  for (var k in o) if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))
-  return fmt
-}
 
-function getStorage(...keys) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get(keys, function(result) {
-      resolve(keys.map(key => result[key]))
-    })
-  })
+  function insertTSCode(type) {
+    let TSStr = "",
+      name = "",
+      mode;
+    if (type === "header") {
+      TSStr = toTS(str[0] || "", "request");
+      node = document.querySelector(".colHeader");
+    } else {
+      TSStr = toTS(str[1] || "", "response");
+      node = document.querySelector(".colBody");
+    }
+    let pre = document.createElement("pre");
+    let code = document.createElement("code");
+    code.className = "language-typescript";
+    code.innerText = TSStr;
+    pre.appendChild(code);
+    insertAfter(node, pre);
+  }
+  insertTSCode("header");
+  insertTSCode("after");
 }
